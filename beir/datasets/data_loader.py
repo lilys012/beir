@@ -42,7 +42,7 @@ class GenericDataLoader:
             logger.info("Loading Corpus...")
             self._load_corpus()
             logger.info("Loaded %d Documents.", len(self.corpus))
-            logger.info("Doc Example: %s", list(self.corpus.values())[0])
+            #logger.info("Doc Example: %s", list(self.corpus.values())[0])
         
         if not len(self.queries):
             logger.info("Loading Queries...")
@@ -52,7 +52,7 @@ class GenericDataLoader:
             self._load_qrels()
             self.queries = {qid: self.queries[qid] for qid in self.qrels}
             logger.info("Loaded %d Queries.", len(self.queries))
-            logger.info("Query Example: %s", list(self.queries.values())[0])
+            #logger.info("Query Example: %s", list(self.queries.values())[0])
         
         return self.corpus, self.queries, self.qrels
 
@@ -67,7 +67,7 @@ class GenericDataLoader:
             logger.info("Loading Corpus...")
             self._load_corpus()
             logger.info("Loaded %d %s Documents.", len(self.corpus), split.upper())
-            logger.info("Doc Example: %s", list(self.corpus.values())[0])
+            #logger.info("Doc Example: %s", list(self.corpus.values())[0])
         
         if not len(self.queries):
             logger.info("Loading Queries...")
@@ -77,7 +77,7 @@ class GenericDataLoader:
             self._load_qrels()
             self.queries = {qid: self.queries[qid] for qid in self.qrels}
             logger.info("Loaded %d %s Queries.", len(self.queries), split.upper())
-            logger.info("Query Example: %s", list(self.queries.values())[0])
+            #logger.info("Query Example: %s", list(self.queries.values())[0])
         
         return self.corpus, self.queries, self.qrels
     
@@ -89,7 +89,7 @@ class GenericDataLoader:
             logger.info("Loading Corpus...")
             self._load_corpus()
             logger.info("Loaded %d Documents.", len(self.corpus))
-            logger.info("Doc Example: %s", list(self.corpus.values())[0])
+            #logger.info("Doc Example: %s", list(self.corpus.values())[0])
 
         return self.corpus
     

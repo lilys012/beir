@@ -10,6 +10,7 @@ from typing import Dict, Type, List, Callable, Iterable, Tuple
 import logging
 import time
 import difflib
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -28,14 +29,39 @@ class TrainRetriever:
         for idx, start_idx in enumerate(trange(0, len(query_ids), self.batch_size, desc='Adding Input Examples')):
             query_ids_batch = query_ids[start_idx:start_idx+self.batch_size]
             for query_id in query_ids_batch:
+                #count = 0 #### for counting
                 for corpus_id, score in qrels[query_id].items():
                     if score >= 1: # if score = 0, we don't consider for training
                         try:
+                            #if count >= 3: break #### only 3 examples
+                            #count = count + 1
                             s1 = queries[query_id]
                             s2 = corpus[corpus_id].get("title") + " " + corpus[corpus_id].get("text") 
                             train_samples.append(InputExample(guid=idx, texts=[s1, s2], label=1))
                         except KeyError:
                             logging.error("Error: Key {} not present in corpus!".format(corpus_id))
+
+        logger.info("Loaded {} training pairs.".format(len(train_samples)))
+        return train_samples
+
+    def load_train_qrel(self, corpus: Dict[str, Dict[str, str]], queries: Dict[str, str], qrels: Dict[str, Dict[str, int]], seed, qnum=3) -> List[Type[InputExample]]:
+
+        query_ids = list(queries.keys())
+        train_samples = []
+        for idx, start_idx in enumerate(trange(0, len(query_ids), self.batch_size, desc='Adding Input Examples')):
+            query_ids_batch = query_ids[start_idx:start_idx+self.batch_size]
+            for query_id in query_ids_batch:
+                query_samples = []
+                for corpus_id, score in qrels[query_id].items():
+                    if score >= 1: # if score = 0, we don't consider for training
+                        try:
+                            s1 = queries[query_id]
+                            s2 = corpus[corpus_id].get("title") + " " + corpus[corpus_id].get("text")
+                            query_samples.append(InputExample(guid=idx, texts=[s1, s2], label=1))
+                        except KeyError:
+                            logging.error("Error: Key {} not present in corpus!".format(corpus_id))
+                random.seed(seed)
+                train_samples.extend(random.sample(query_samples, min(qnum, len(query_samples))))
 
         logger.info("Loaded {} training pairs.".format(len(train_samples)))
         return train_samples

@@ -1,4 +1,4 @@
-from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
+from transformers import AutoModelForSeq2SeqLM, AutoTokenizer, AutoConfig
 from tqdm.autonotebook import trange
 import torch, logging, math, queue
 import torch.multiprocessing as mp
@@ -8,9 +8,13 @@ logger = logging.getLogger(__name__)
 
 
 class QGenModel:
-    def __init__(self, model_path: str, gen_prefix: str = "", use_fast: bool = True, device: str = None, **kwargs):
+    def __init__(self, model_path: str, first_token: str = None, gen_prefix: str = "", use_fast: bool = True, device: str = None, **kwargs):
         self.tokenizer = AutoTokenizer.from_pretrained(model_path, use_fast=use_fast)
-        self.model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
+        if first_token is not None:
+            myconfig = AutoConfig.from_pretrained(model_path, forced_bos_token_id=self.tokenizer(first_token)['input_ids'][0])
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(model_path, config=myconfig)
+        else:
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(model_path)
         self.gen_prefix = gen_prefix
         self.device = device or ('cuda' if torch.cuda.is_available() else 'cpu')
         logger.info("Use pytorch device: {}".format(self.device))
